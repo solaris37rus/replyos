@@ -306,14 +306,14 @@ const DEFAULT_TEXT: Record<Niche, Localized> = {
 const COPY = {
   ru: {
     brand: 'ReplyOS',
-    tagline: 'AI для тех, кто пришёл не за текстом, а за результатом.',
+    tagline: 'AI для тех, кто пришёл не за текстом, а за оплатой, ответом и контролем.',
     autoTranslate: 'Автоперевод',
     freeLeft: 'бесплатных анализов осталось',
     heroKicker: 'Outcome Engine for Conversations',
     heroTitle1: 'Превращай',
     heroTitle2: 'молчание в результат.',
     heroText:
-      'ReplyOS показывает, что реально происходит в переписке, и даёт следующий шаг, который меняет исход.',
+      'ReplyOS показывает, что реально происходит в переписке, и даёт следующий шаг, который повышает шанс на ответ, сделку и деньги.',
     primaryCta: 'Анализировать',
     secondaryCta: 'Тарифы',
     analyzerLabel: 'Анализатор',
@@ -332,7 +332,7 @@ const COPY = {
     ],
     valueTitle: 'Почему люди приходят в ReplyOS',
     valueText:
-      'Когда нужен не совет ради совета, а улучшение исхода: ответ, деньги, ясность, контакт, спокойствие или контроль.',
+      'Когда нужен не совет ради совета, а исход: ответ, деньги, ясность, контакт, спокойствие или контроль.',
     valuePoints: [
       'Бизнес: вернуть клиента, закрыть оплату, дожать сделку',
       'Жизнь: ответить без конфликта и не потерять лицо',
@@ -371,18 +371,18 @@ const COPY = {
     copyReply: 'Скопировать ответ',
     shareResult: 'Поделиться',
     copied: 'Скопировано',
-    pricingTitle: 'Монетизация, которая чувствуется честно',
+    pricingTitle: 'Монетизация, которая чувствуется честно и продаёт',
     pricingText:
-      'Free показывает ценность, Pro усиливает прогноз и ответы, Team превращает ReplyOS в рабочий инструмент для команды.',
+      'Free показывает ценность, Pro помогает зарабатывать на каждом диалоге, Team превращает ReplyOS в рабочий инструмент для продаж и закрытия сделок.',
     faqTitle: 'FAQ',
-    finalTitle: 'Выигрывай следующий ответ.',
+    finalTitle: 'Выигрывай следующий ответ и следующий чек.',
     finalText:
-      'ReplyOS создан для ответов, сделок, возврата контакта и сложных разговоров. Сайт должен продавать не текст, а исход.',
-    upgradePro: 'Upgrade to Pro',
-    startTeam: 'Start Team Plan',
-    paywallTitle: 'Вы использовали бесплатные анализы.',
-    paywallText: 'Обновитесь, чтобы продолжать выигрывать переписки.',
-    paywallCaption: 'У вас закончились бесплатные запуски.',
+      'ReplyOS создан для ответов, сделок, возврата контакта и сложных разговоров. Сайт должен продавать не текст, а исход, который приносит деньги.',
+    upgradePro: 'Открыть Pro',
+    startTeam: 'Team для продаж',
+    paywallTitle: 'Бесплатные разборы закончились — дальше начинается рост выручки.',
+    paywallText: 'Откройте Pro, чтобы получать больше ответов, больше сделок и меньше потерянных контактов.',
+    paywallCaption: 'Следующий разбор должен уже приносить деньги, а не просто интерес.',
     socialProofLabel: 'Премиальный AI-инструмент',
     socialProof: [
       'Reply probability',
@@ -659,13 +659,13 @@ const COPY = {
     copied: 'Copied',
     pricingTitle: 'Monetization that feels fair',
     pricingText:
-      'Free shows value, Pro deepens analysis and replies, Team turns ReplyOS into a working tool for the team.',
+      'Free shows value, Pro deepens analysis and replies, Team turns ReplyOS into a working tool for sales and deal closing.',
     faqTitle: 'FAQ',
     finalTitle: 'Win the next reply.',
     finalText:
       'ReplyOS is built for replies, deals, reconnection, and hard conversations. The site must sell outcomes, not text.',
-    upgradePro: 'Upgrade to Pro',
-    startTeam: 'Start Team Plan',
+    upgradePro: 'Unlock Pro',
+    startTeam: 'Team for sales',
     paywallTitle: 'You have unlocked your free analyses.',
     paywallText: 'Upgrade to keep winning conversations.',
     paywallCaption: 'Your free runs are gone.',
@@ -1075,14 +1075,15 @@ function FeatureCard({
   icon,
   title,
   text,
-}: FeatureItem) {
+  lang,
+}: FeatureItem & { lang: Lang }) {
   return (
     <div className="rounded-[24px] border border-white/10 bg-white/[0.035] p-5">
       <div className="inline-flex rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] tracking-[0.25em] text-white/45">
         {icon}
       </div>
-      <div className="mt-4 text-lg font-semibold">{tx(title, 'ru')}</div>
-      <p className="mt-2 text-sm leading-6 text-white/60">{tx(text, 'ru')}</p>
+      <div className="mt-4 text-lg font-semibold">{tx(title, lang)}</div>
+      <p className="mt-2 text-sm leading-6 text-white/60">{tx(text, lang)}</p>
     </div>
   );
 }
@@ -1155,6 +1156,7 @@ export default function Page() {
   const [freeLeft, setFreeLeft] = useState(3);
   const [error, setError] = useState('');
   const [langMode, setLangMode] = useState<LangMode>('auto');
+  const [mounted, setMounted] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -1170,6 +1172,8 @@ export default function Page() {
     if (savedLang === 'auto' || savedLang === 'ru' || savedLang === 'en') {
       setLangMode(savedLang);
     }
+
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -1180,10 +1184,8 @@ export default function Page() {
     localStorage.setItem('replyos_lang_mode', langMode);
   }, [langMode]);
 
-  const resolvedLang = useMemo<Lang>(() => {
-    if (langMode === 'auto') return getBrowserLang();
-    return langMode;
-  }, [langMode]);
+  const resolvedLang: Lang =
+    langMode === 'auto' ? (mounted ? getBrowserLang() : 'ru') : langMode;
 
   const ui = useMemo(() => COPY[resolvedLang], [resolvedLang]);
   const currentNiche = useMemo(
@@ -1319,7 +1321,7 @@ export default function Page() {
               R
             </div>
             <div>
-              <div className="text-2xl font-semibold tracking-tight">
+              <div className="text-xl font-semibold tracking-tight md:text-2xl">
                 {ui.brand}
               </div>
               <p className="text-sm text-white/60">{ui.tagline}</p>
@@ -1371,7 +1373,7 @@ export default function Page() {
               </span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/68 md:text-xl">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/68 md:text-xl">
               {ui.heroText}
             </p>
 
@@ -1390,7 +1392,7 @@ export default function Page() {
               </a>
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {ui.socialProof.map((item) => (
                 <HeroStat
                   key={item}
@@ -1400,15 +1402,15 @@ export default function Page() {
               ))}
             </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              <HeroStat label="Outcome" value="Replies / Deals / Control" />
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <HeroStat label="Outcome" value="Replies / Deals / Revenue" />
               <HeroStat label="Flow" value="Analyze → Diagnose → Act" />
-              <HeroStat label="Risk" value="Hard paywall ready" />
+              <HeroStat label="Risk" value="Built to convert" />
             </div>
           </div>
 
           <div className="lg:col-span-5">
-            <GlassCard className="sticky top-6 p-6">
+            <GlassCard className="p-6 lg:sticky lg:top-6">
               <div className="flex items-center justify-between">
                 <div>
                   <SectionLabel text={ui.analyzerLabel} />
@@ -1571,7 +1573,7 @@ export default function Page() {
                   ? 'Вставь сюда переписку целиком...'
                   : 'Paste the full conversation here...'
               }
-              className="mt-5 min-h-[280px] w-full rounded-[24px] border border-white/10 bg-black/30 p-4 text-sm leading-7 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/60"
+              className="mt-5 min-h-[220px] w-full rounded-[24px] border border-white/10 bg-black/30 p-4 text-sm leading-7 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/60 sm:min-h-[280px]"
             />
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -1649,7 +1651,7 @@ export default function Page() {
           <GlassCard className="p-6">
             <SectionLabel text={ui.resultsLabel} />
             {result ? (
-              <div className="mt-6 space-y-8">
+              <div className="mt-6 space-y-7">
                 <div className="rounded-[28px] border border-cyan-300/20 bg-cyan-400/10 p-6">
                   <div className="text-[11px] uppercase tracking-[0.3em] text-cyan-100/70">
                     {ui.scoreTitle}
@@ -1662,7 +1664,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-3">
                   <MetricCard
                     label={SCORE_LABELS[resolvedLang].interest}
                     value={score ? score.interest : '-'}
@@ -1680,7 +1682,7 @@ export default function Page() {
                   />
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-12">
+                <div className="grid gap-5 lg:grid-cols-12">
                   <div className="lg:col-span-5 space-y-4">
                     <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">
                       <div className="text-xs uppercase tracking-[0.24em] text-white/40">
@@ -1822,7 +1824,7 @@ export default function Page() {
 
         <section className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
           {ui.featureCards.map((feature) => (
-            <FeatureCard key={feature.icon} {...feature} />
+            <FeatureCard key={feature.icon} lang={resolvedLang} {...feature} />
           ))}
         </section>
 
@@ -1872,7 +1874,7 @@ export default function Page() {
             />
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-3">
             {ui.pricing.map((plan) => (
               <GlassCard key={tx(plan.name, resolvedLang)} className="p-6">
                 <div className="flex items-center justify-between">
@@ -1904,7 +1906,7 @@ export default function Page() {
                     onClick={() => setPaywallOpen(true)}
                     className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[1.01]"
                   >
-                    {plan.name.ru === 'Free' ? ui.primaryCta : ui.upgradePro}
+                    {plan.name.ru === 'Free' ? ui.primaryCta : (resolvedLang === 'ru' ? 'Открыть Pro' : 'Unlock Pro')}
                   </button>
                   <button className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/[0.08]">
                     {ui.startTeam}
@@ -1960,7 +1962,7 @@ export default function Page() {
                 onClick={() => setPaywallOpen(true)}
                 className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:scale-[1.01]"
               >
-                {ui.upgradePro}
+                {resolvedLang === 'ru' ? 'Открыть Pro и зарабатывать' : 'Unlock Pro and monetize'}
               </button>
               <a
                 href="#pricing"
@@ -2003,7 +2005,7 @@ export default function Page() {
                   }}
                   className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black"
                 >
-                  {ui.upgradePro}
+                  {resolvedLang === 'ru' ? 'Перейти на Pro' : 'Upgrade to Pro'}
                 </button>
                 <button
                   onClick={() => setPaywallOpen(false)}

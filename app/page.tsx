@@ -371,6 +371,14 @@ const COPY = {
     copyReply: 'Скопировать ответ',
     shareResult: 'Поделиться',
     copied: 'Скопировано',
+    checkout: 'Оплатить',
+    continueToPricing: 'Смотреть тарифы',
+    mostPopular: 'Самый популярный',
+    teamReady: 'Для команды',
+    starter: 'Старт',
+    paywallLabel: 'Оплата',
+    testimonialsLabel: 'Отзывы',
+    footer: 'ReplyOS • Outcome Engine для переписок',
     pricingTitle: 'Монетизация, которая чувствуется честно и продаёт',
     pricingText:
       'Free показывает ценность, Pro помогает зарабатывать на каждом диалоге, Team превращает ReplyOS в рабочий инструмент для продаж и закрытия сделок.',
@@ -657,6 +665,14 @@ const COPY = {
     copyReply: 'Copy reply',
     shareResult: 'Share',
     copied: 'Copied',
+    checkout: 'Checkout',
+    continueToPricing: 'View pricing',
+    mostPopular: 'Most popular',
+    teamReady: 'Team ready',
+    starter: 'Starter',
+    paywallLabel: 'Checkout',
+    testimonialsLabel: 'Testimonials',
+    footer: 'ReplyOS • Outcome Engine for Conversations',
     pricingTitle: 'Monetization that feels fair',
     pricingText:
       'Free shows value, Pro deepens analysis and replies, Team turns ReplyOS into a working tool for sales and deal closing.',
@@ -942,6 +958,11 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+const PAYMENT_LINKS = {
+  pro: process.env.NEXT_PUBLIC_REPLYOS_PRO_CHECKOUT_URL ?? '',
+  team: process.env.NEXT_PUBLIC_REPLYOS_TEAM_CHECKOUT_URL ?? '',
+} as const;
+
 function GlassCard({
   children,
   className,
@@ -1093,11 +1114,13 @@ function ReplyCard({
   isBest,
   onCopy,
   copied,
+  lang,
 }: {
   reply: { style: string; text: string; whyItWorks: string };
   isBest: boolean;
   onCopy: () => void;
   copied: boolean;
+  lang: Lang;
 }) {
   return (
     <div
@@ -1115,7 +1138,7 @@ function ReplyCard({
           </div>
           <div className="mt-3 text-base leading-7 text-white">{reply.text}</div>
         </div>
-        {isBest ? <SmallPill>BEST</SmallPill> : null}
+        {isBest ? <SmallPill>{lang === 'ru' ? 'ЛУЧШИЙ' : 'BEST'}</SmallPill> : null}
       </div>
 
       <div className="mt-4 text-sm leading-6 text-white/60">
@@ -1126,7 +1149,7 @@ function ReplyCard({
         onClick={onCopy}
         className="mt-4 inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-white/80 transition hover:bg-white/[0.08]"
       >
-        {copied ? '✓ Copied' : 'Copy reply'}
+        {copied ? `✓ ${lang === 'ru' ? 'Скопировано' : 'Copied'}` : lang === 'ru' ? 'Скопировать ответ' : 'Copy reply'}
       </button>
     </div>
   );
@@ -1201,6 +1224,17 @@ export default function Page() {
   const score = result?.analysis;
   const replies = result?.replies ?? [];
   const confidence = result?.confidence ?? 0;
+
+  function openPlanCheckout(plan: 'pro' | 'team') {
+    const url = PAYMENT_LINKS[plan];
+
+    if (url) {
+      window.location.href = url;
+      return true;
+    }
+
+    return false;
+  }
 
   async function onAnalyze() {
     if (!text.trim()) {
@@ -1403,9 +1437,18 @@ export default function Page() {
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <HeroStat label="Outcome" value="Replies / Deals / Revenue" />
-              <HeroStat label="Flow" value="Analyze → Diagnose → Act" />
-              <HeroStat label="Risk" value="Built to convert" />
+              <HeroStat
+                label={resolvedLang === 'ru' ? 'Исход' : 'Outcome'}
+                value={resolvedLang === 'ru' ? 'Ответы / сделки / выручка' : 'Replies / deals / revenue'}
+              />
+              <HeroStat
+                label={resolvedLang === 'ru' ? 'Поток' : 'Flow'}
+                value={resolvedLang === 'ru' ? 'Анализ → диагноз → действие' : 'Analyze → Diagnose → Act'}
+              />
+              <HeroStat
+                label={resolvedLang === 'ru' ? 'Риск' : 'Risk'}
+                value={resolvedLang === 'ru' ? 'Создан, чтобы конвертировать' : 'Built to convert'}
+              />
             </div>
           </div>
 
@@ -1423,45 +1466,45 @@ export default function Page() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4">
                     <div className="text-[11px] uppercase tracking-[0.25em] text-white/40">
-                      Reply
+                      {resolvedLang === 'ru' ? 'Ответ' : 'Reply'}
                     </div>
-                    <div className="mt-2 text-xl font-semibold">Live</div>
+                    <div className="mt-2 text-xl font-semibold">{resolvedLang === 'ru' ? 'Живой' : 'Live'}</div>
                   </div>
                   <div className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4">
                     <div className="text-[11px] uppercase tracking-[0.25em] text-white/40">
-                      Deal
+                      {resolvedLang === 'ru' ? 'Сделка' : 'Deal'}
                     </div>
-                    <div className="mt-2 text-xl font-semibold">Score</div>
+                    <div className="mt-2 text-xl font-semibold">{resolvedLang === 'ru' ? 'Оценка' : 'Score'}</div>
                   </div>
                   <div className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4">
                     <div className="text-[11px] uppercase tracking-[0.25em] text-white/40">
-                      Trust
+                      {resolvedLang === 'ru' ? 'Доверие' : 'Trust'}
                     </div>
-                    <div className="mt-2 text-xl font-semibold">Layer</div>
+                    <div className="mt-2 text-xl font-semibold">{resolvedLang === 'ru' ? 'Слой' : 'Layer'}</div>
                   </div>
                 </div>
 
                 <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">
                   <div className="text-xs uppercase tracking-[0.28em] text-white/40">
-                    3-step engine
+                    {resolvedLang === 'ru' ? '3-шаговый движок' : '3-step engine'}
                   </div>
                   <div className="mt-4 grid gap-3">
                     <div className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4">
-                      <div className="font-semibold">1. Diagnose</div>
+                      <div className="font-semibold">{resolvedLang === 'ru' ? '1. Диагноз' : '1. Diagnose'}</div>
                       <p className="mt-2 text-sm text-white/60">
-                        Understand the real friction behind silence.
+                        {resolvedLang === 'ru' ? 'Понять реальную причину молчания.' : 'Understand the real friction behind silence.'}
                       </p>
                     </div>
                     <div className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4">
-                      <div className="font-semibold">2. Generate</div>
+                      <div className="font-semibold">{resolvedLang === 'ru' ? '2. Генерация' : '2. Generate'}</div>
                       <p className="mt-2 text-sm text-white/60">
-                        Produce reply options for different strategies.
+                        {resolvedLang === 'ru' ? 'Сгенерировать ответы под разные стратегии.' : 'Produce reply options for different strategies.'}
                       </p>
                     </div>
                     <div className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4">
-                      <div className="font-semibold">3. Control</div>
+                      <div className="font-semibold">{resolvedLang === 'ru' ? '3. Контроль' : '3. Control'}</div>
                       <p className="mt-2 text-sm text-white/60">
-                        Decide when to write, wait, or shift the frame.
+                        {resolvedLang === 'ru' ? 'Понять, когда писать, ждать или менять рамку.' : 'Decide when to write, wait, or shift the frame.'}
                       </p>
                     </div>
                   </div>
@@ -1561,6 +1604,10 @@ export default function Page() {
                 <h2 className="mt-3 text-2xl font-semibold">
                   {resolvedLang === 'ru' ? '3. Вставь переписку' : '3. Paste the conversation'}
                 </h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <SmallPill>{tx(currentNiche.title, resolvedLang)}</SmallPill>
+                  <SmallPill>{tx(currentGoal.label, resolvedLang)}</SmallPill>
+                </div>
               </div>
               <SmallPill>{ui.analyzerHint}</SmallPill>
             </div>
@@ -1775,6 +1822,7 @@ export default function Page() {
                             isBest={index === 0}
                             onCopy={() => copyReply(reply.text, index)}
                             copied={copiedIndex === index}
+                            lang={resolvedLang}
                           />
                         ))
                       ) : (
@@ -1830,7 +1878,7 @@ export default function Page() {
 
         <section className="mt-12">
           <GlassCard className="p-6 md:p-8">
-            <SectionLabel text="Testimonials" />
+            <SectionLabel text={ui.testimonialsLabel} />
             <SectionTitle
               title={resolvedLang === 'ru' ? 'Доверие, которое продаёт' : 'Trust that sells'}
               text={
@@ -1882,11 +1930,7 @@ export default function Page() {
                     {tx(plan.name, resolvedLang)}
                   </div>
                   <SmallPill>
-                    {plan.accent === 'cyan'
-                      ? 'Most popular'
-                      : plan.accent === 'violet'
-                        ? 'Team ready'
-                        : 'Starter'}
+                    {plan.accent === 'cyan' ? ui.mostPopular : plan.accent === 'violet' ? ui.teamReady : ui.starter}
                   </SmallPill>
                 </div>
 
@@ -1903,13 +1947,31 @@ export default function Page() {
 
                 <div className="mt-6 flex flex-col gap-3">
                   <button
-                    onClick={() => setPaywallOpen(true)}
+                    onClick={() => {
+                      if (plan.name.ru === 'Free') {
+                        document.getElementById('analyzer')?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                        return;
+                      }
+
+                      const opened = openPlanCheckout(plan.accent === 'cyan' ? 'pro' : 'team');
+                      if (!opened) setPaywallOpen(true);
+                    }}
                     className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[1.01]"
                   >
-                    {plan.name.ru === 'Free' ? ui.primaryCta : (resolvedLang === 'ru' ? 'Открыть Pro' : 'Unlock Pro')}
+                    {plan.name.ru === 'Free'
+                      ? ui.primaryCta
+                      : plan.accent === 'cyan'
+                        ? (resolvedLang === 'ru' ? 'Перейти к оплате Pro' : 'Go to Pro checkout')
+                        : (resolvedLang === 'ru' ? 'Перейти к оплате Team' : 'Go to Team checkout')}
                   </button>
-                  <button className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/[0.08]">
-                    {ui.startTeam}
+                  <button
+                    onClick={() => setPaywallOpen(true)}
+                    className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/[0.08]"
+                  >
+                    {resolvedLang === 'ru' ? 'Посмотреть, что входит' : 'See what is included'}
                   </button>
                 </div>
               </GlassCard>
@@ -1959,7 +2021,10 @@ export default function Page() {
 
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
               <button
-                onClick={() => setPaywallOpen(true)}
+                onClick={() => {
+                  const opened = openPlanCheckout('pro');
+                  if (!opened) setPaywallOpen(true);
+                }}
                 className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:scale-[1.01]"
               >
                 {resolvedLang === 'ru' ? 'Открыть Pro и зарабатывать' : 'Unlock Pro and monetize'}
@@ -1975,7 +2040,7 @@ export default function Page() {
         </section>
 
         <footer className="pb-8 text-center text-xs uppercase tracking-[0.3em] text-white/35">
-          ReplyOS • Outcome Engine for Conversations
+          {ui.footer}
         </footer>
       </div>
 
@@ -1983,7 +2048,7 @@ export default function Page() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 backdrop-blur-md">
           <div className="w-full max-w-xl">
             <GlassCard className="p-6 md:p-8">
-              <SectionLabel text="Paywall" />
+              <SectionLabel text={ui.paywallLabel} />
               <div className="mt-3 text-2xl font-semibold">
                 {ui.paywallTitle}
               </div>
@@ -1997,15 +2062,18 @@ export default function Page() {
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => {
-                    setPaywallOpen(false);
-                    document.getElementById('pricing')?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
+                    const opened = openPlanCheckout('pro');
+                    if (!opened) {
+                      setPaywallOpen(false);
+                      document.getElementById('pricing')?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      });
+                    }
                   }}
                   className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black"
                 >
-                  {resolvedLang === 'ru' ? 'Перейти на Pro' : 'Upgrade to Pro'}
+                  {resolvedLang === 'ru' ? 'Перейти к оплате' : 'Go to checkout'}
                 </button>
                 <button
                   onClick={() => setPaywallOpen(false)}
